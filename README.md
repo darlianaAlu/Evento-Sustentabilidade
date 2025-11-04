@@ -1,4 +1,5 @@
-Enunciado n/
+Enunciado
+
 Você deverá desenvolver uma aplicação web em Java (JSP + Servlet) aplicando o
 padrão MVC, utilizando Bootstrap para a interface gráfica e PostgreSQL como banco de
 dados relacional.
