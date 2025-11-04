@@ -1,0 +1,66 @@
+package com.sustentabilidade.controle;
+
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.List;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+
+import com.sustentabilidade.dao.InscricaoDAO;
+import com.sustentabilidade.modelo.Inscricao;
+
+@WebServlet("/auth/admin")
+public class AdminControle extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+	
+	private InscricaoDAO inscricaoDAO;
+       
+    public AdminControle() {
+        super();
+    }
+    
+	public void init() {
+		inscricaoDAO = new InscricaoDAO();
+	}
+
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		processaRequisicao(request, response);
+	}
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		processaRequisicao(request, response);
+	}
+	
+	private void processaRequisicao(HttpServletRequest request, HttpServletResponse response) {
+		String acao = request.getParameter("acao");
+		try {
+			switch (acao) {
+			case "listar":
+				listarInscricoes(request, response);
+				break;	
+			}
+			
+		} catch (Exception ex) {
+			//throw new ServletException(ex);
+		}
+	}
+
+	private void listarInscricoes(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
+		List<Inscricao> inscricoes = inscricaoDAO.listarTodosInscricoes();
+		
+request.setAttribute("listaInscricoes", inscricoes);
+		
+		String path =  request.getServletPath() + "/admin-listar-inscricao.jsp";
+		RequestDispatcher dispatcher = request.getRequestDispatcher(path);
+		
+		dispatcher.forward(request, response);
+
+	
+	}
+	}
