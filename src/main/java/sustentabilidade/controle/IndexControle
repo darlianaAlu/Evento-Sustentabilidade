@@ -1,0 +1,95 @@
+package com.sustentabilidade.controle;
+
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.Date;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import com.sustentabilidade.controle.util.ManipulacaoData;
+import com.sustentabilidade.dao.InscricaoDAO;
+import com.sustentabilidade.modelo.Inscricao;
+
+
+
+/**
+ * Servlet implementation class IndexControle
+ */
+@WebServlet("/publica")
+public class IndexControle extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+       
+	private InscricaoDAO inscricaoDAO;
+	
+    public IndexControle() {
+        super();
+    }
+    public void init() {
+		inscricaoDAO = new InscricaoDAO();
+	}
+
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		processarRequisicao(request, response);
+	}
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		processarRequisicao(request, response);
+	}
+	
+	private void processarRequisicao(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		String acao = request.getParameter("acao");
+		try {
+			switch (acao) {
+			case "novo":
+				novoInscricao(request, response);
+				break;
+			case "inserir":
+				gravarInscricao(request, response);
+				break;
+			}
+		} catch (Exception ex) {
+			throw new ServletException(ex);
+		}
+		
+	}
+	
+	private void novoInscricao(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {		
+		
+		RequestDispatcher dispatcher = request.getRequestDispatcher("publica/publica-nova-inscricao.jsp");
+		dispatcher.forward(request, response);
+	}
+	
+	private void gravarInscricao(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException, SQLException {		
+		
+		String nome = request.getParameter("nome");
+		String email = request.getParameter("email");
+		String cidade = request.getParameter("cidade");
+		String evento = request.getParameter("evento");
+		String data = request.getParameter("inscricao");
+		
+		ManipulacaoData manipulacaoData = new ManipulacaoData();
+		Date dataInscricao = manipulacaoData.converterStringData(data);
+		
+		Inscricao inscricao = new Inscricao(nome, email, cidade, evento, dataInscricao);
+		
+		Inscricao inscricaoGravado = inscricaoDAO.inserirInscricao(inscricao);
+		
+		request.setAttribute("inscricao", inscricaoGravado);
+	    request.setAttribute("mensagem", "Inscri��o realizada com sucesso!");
+		
+		RequestDispatcher dispatcher = request.getRequestDispatcher("publica/publica-detalhes-inscricao.jsp");
+		request.setAttribute("mensagem", "Inscri��o Gravada com sucesso");
+		dispatcher.forward(request, response);
+		
+		System.out.print(inscricao);
+		
+	}
+
+}
